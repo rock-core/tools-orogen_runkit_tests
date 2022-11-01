@@ -1,46 +1,45 @@
 /* Generated from orogen/lib/orogen/templates/tasks/Task.hpp */
 
-#ifndef OROGEN_RUNKIT_TESTS_TASK_TASK_HPP
-#define OROGEN_RUNKIT_TESTS_TASK_TASK_HPP
+#ifndef OROGEN_RUNKIT_TESTS_EMPTYTASK_TASK_HPP
+#define OROGEN_RUNKIT_TESTS_EMPTYTASK_TASK_HPP
 
-#include "orogen_runkit_tests/TaskBase.hpp"
+#include "orogen_runkit_tests/EmptyTaskBase.hpp"
 
-namespace orogen_runkit_tests{
+namespace orogen_runkit_tests {
 
-    /*! \class Task
-     * \brief The task context provides and requires services. It uses an ExecutionEngine to perform its functions.
-     * Essential interfaces are operations, data flow ports and properties. These interfaces have been defined using the oroGen specification.
-     * In order to modify the interfaces you should (re)use oroGen and rely on the associated workflow.
-     * Declare a new task context (i.e., a component)
-
-The corresponding C++ class can be edited in tasks/Task.hpp and
-tasks/Task.cpp, and will be put in the orogen_runkit_tests namespace.
+    /*! \class EmptyTask
+     * \brief The task context provides and requires services. It uses an ExecutionEngine
+     to perform its functions.
+     * Essential interfaces are operations, data flow ports and properties. These
+     interfaces have been defined using the oroGen specification.
+     * In order to modify the interfaces you should (re)use oroGen and rely on the
+     associated workflow.
+     *
      * \details
      * The name of a TaskContext is primarily defined via:
      \verbatim
      deployment 'deployment_name'
-         task('custom_task_name','orogen_runkit_tests::Task')
+         task('custom_task_name','orogen_runkit_tests::EmptyTask')
      end
      \endverbatim
-     *  It can be dynamically adapted when the deployment is called with a prefix argument.
+     *  It can be dynamically adapted when the deployment is called with a prefix
+     argument.
      */
-    class Task : public TaskBase
-    {
-	friend class TaskBase;
+    class EmptyTask : public EmptyTaskBase {
+        friend class EmptyTaskBase;
+
     protected:
-
-
-
     public:
-        /** TaskContext constructor for Task
-         * \param name Name of the task. This name needs to be unique to make it identifiable via nameservices.
-         * \param initial_state The initial TaskState of the TaskContext. Default is Stopped state.
+        /** TaskContext constructor for EmptyTask
+         * \param name Name of the task. This name needs to be unique to make it
+         * identifiable via nameservices. \param initial_state The initial TaskState of
+         * the TaskContext. Default is Stopped state.
          */
-        Task(std::string const& name = "orogen_runkit_tests::Task");
+        EmptyTask(std::string const& name = "orogen_runkit_tests::EmptyTask");
 
-        /** Default deconstructor of Task
+        /** Default deconstructor of EmptyTask
          */
-	~Task();
+        ~EmptyTask();
 
         /** This hook is called by Orocos when the state machine transitions
          * from PreOperational to Stopped. If it returns false, then the
@@ -103,4 +102,3 @@ tasks/Task.cpp, and will be put in the orogen_runkit_tests namespace.
 }
 
 #endif
-

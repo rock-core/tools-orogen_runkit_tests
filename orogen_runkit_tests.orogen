@@ -1,55 +1,154 @@
+# frozen_string_literal: true
+
 name "orogen_runkit_tests"
-# Optionally declare the version number
-# version "0.1"
 
-# If new data types need to be defined, they have to be put in a separate C++
-# header, and this header will be loaded here
-import_types_from "orogen_runkit_testsTypes.hpp"
-# Finally, it is pretty common that headers are directly loaded from an external
-# library. In this case, the library must be first used (the name is the
-# library's pkg-config name) and then the header can be used. Following Rock
-# conventions, a common use-case would be:
-#
-# using_library "orogen_runkit_tests"
-# import_types_from "orogen_runkit_tests/CustomType.hpp"
-
-# If this project uses data types that are defined in other oroGen projects,
-# these projects should be imported there as well.
 import_types_from "std"
-# import_types_from "base"
+import_types_from "base"
+import_types_from "orogen_runkit_testsTypes.hpp"
 
-# Declare a new task context (i.e., a component)
-#
-# The corresponding C++ class can be edited in tasks/Task.hpp and
-# tasks/Task.cpp, and will be put in the orogen_runkit_tests namespace.
-task_context "Task" do
-    # This is the default from now on, and should not be removed. Rock will
-    # transition to a setup where all components use a configuration step.
+task_context "EmptyTask" do
+    needs_configuration
+end
+
+task_context "Echo" do
     needs_configuration
 
-    # A configuration property (here, a std::string). Its value can be retrieved
-    # in the C++ code with # _config_value.get() and _config_value.set(new_value).
-    property "config_value", "/std/string"
+    input_port "in", "/double"
+    output_port "out", "/double"
+    output_port("ondemand", "/double")
+        .keep_last_written_value(true)
 
-    # An input port, i.e. an object from which the component gets data from
-    # other components' outputs
-    #
-    # Data can be retrieved using _input.read(value), which returns true if data
-    # was available, and false otherwise. _input.connected() returns if this
-    # input is connected to an output or not.
-    input_port "input", "/std/string"
+    input_port "struct_in", "/base/samples/Joints"
+    output_port "struct_out", "/base/samples/Joints"
 
-    # An output port, i.e. an object to which the component pushes data so that
-    # it is transmitted to other components' inputs
-    #
-    # Data can be written using _output.write(value). _output.connected() returns
-    # if this output is connected to an input or not.
-    output_port "output", "int"
+    input_port "opaque_in", "/base/Vector3d"
+    output_port "opaque_out", "/base/Vector3d"
 
-    # If you want that component's updateHook() to be executed when the "input"
-    # port gets data, uncomment this and comment the 'periodic' line
-    # port_driven "input"
-    # By default, the task will be periodic with a period of 0.1
+    port_driven
+end
+
+task_context "Operations" do
+    needs_configuration
+
+    operation("empty")
+
+    operation("simple")
+        .returns("int")
+        .arg("b", "base::Time const&")
+
+    operation("simple_with_return")
+        .returns("base::Time")
+        .arg("b", "base::Time const&")
+
+    operation("with_returned_opaque")
+        .returns("base::Vector3d")
+        .arg("b", "base::Time const&")
+
+    operation("with_opaque_argument")
+        .returns("base::Time")
+        .arg("b", "base::Vector3d const&")
+
+    operation("with_returned_parameter")
+        .returns("base::Time")
+        .arg("a", "base::Time&")
+        .arg("b", "base::Vector3d const&")
+
+    operation("string_handling")
+        .returns("string")
+        .arg("b", "string const&")
+end
+
+task_context "SimpleSource" do
+    needs_configuration
+
+    property "increment", "/double", 4
+
+    output_port "out0", "/double"
+    output_port "out1", "/double"
+    output_port "out2", "/double"
+    output_port "out3", "/double"
+
     periodic 0.1
 end
 
+task_context "SimpleSink" do
+    needs_configuration
+
+    input_port "in0", "/double"
+    input_port "in1", "/double"
+    input_port "in2", "/double"
+    input_port "in3", "/double"
+
+    port_driven
+end
+
+deployment "fast_source_sink" do
+    task("fast_source", "SimpleSource")
+        .periodic(0.001)
+    task("fast_sink", "SimpleSink")
+        .periodic(0.001)
+end
+
+task_context "Kill" do
+    needs_configuration
+
+    operation(:kill)
+end
+
+task_context "StateTransitions" do
+    needs_configuration
+
+    operation("do_recover")
+    operation("do_runtime_error")
+    operation("do_recover")
+    operation("do_exception")
+
+    operation("do_custom_runtime")
+    operation("do_custom_error")
+    operation("do_custom_exception")
+    operation("do_nominal_running")
+
+    runtime_states :CUSTOM_RUNTIME
+    error_states :CUSTOM_ERROR
+    exception_states :CUSTOM_EXCEPTION
+end
+
+task_context "Uncaught" do
+    needs_configuration
+
+    property "exception_level", "int", 0
+
+    operation "do_runtime_error"
+    periodic 0.1
+end
+
+task_context "Configurations" do
+    needs_configuration
+
+    property "enm", "/orogen_runkit_tests/Enumeration", :THIRD
+    property "intg", "/int", 42
+    property "str", "/std/string", "test3"
+    property "fp", "/double", 0.5
+    property "bl", "/bool", false
+
+    property "compound", "/orogen_runkit_tests/ComplexStructure"
+    property "simple_container", "/std/vector<int>"
+    property "complex_container", "/std/vector</orogen_runkit_tests/ArrayElement>"
+end
+
+task_context "Properties" do
+    needs_configuration
+
+    property "prop1", "/base/Time"
+    property "prop2", "int", 84
+    property "prop3", "string", "42"
+
+    property("dynamic_prop", "string").dynamic
+    # Set to true by the dynamic property's setter method to reflect that it has
+    # been called
+    property("dynamic_prop_setter_called", "bool", false)
+
+    attribute "att1", "/base/Time"
+    attribute "att2", "int"
+    attribute "att3", "string"
+end
