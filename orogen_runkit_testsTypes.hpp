@@ -51,7 +51,7 @@ namespace orogen_runkit_tests {
         int simple_array[10];
 
         std::vector<ArrayElement> vector_of_compound;
-        std::vector<std::vector<ArrayElement>> vector_of_vector_of_compound;
+        std::vector< std::vector<ArrayElement> > vector_of_vector_of_compound;
         ArrayElement array_of_compound[10];
         std::vector<ArrayElement> array_of_vector_of_compound[10];
 
